@@ -1,0 +1,169 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="ExcelImport.WebUI.SiteMaster" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head runat="server">
+    <title></title>
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script type="text/javascript">
+
+            $(window).ready(
+                function () {
+                    $('#Import').click(function (e) {
+                        ImportProducers($('input:checked[id!="Checkall"]'));
+                    });
+
+                    $('span.name').click(function (e) {
+                        $(e.target).next('.hide').toggle();
+                        //console.log($(e.target));
+                    });
+
+                    $('#Checkall').click(function (e) {
+                        if ($(e.target).attr('checked') == undefined)
+                            $('input:checkbox').attr('checked', false);
+                        else
+                            $('input:checkbox').attr('checked', 'checked');
+                    });
+
+
+                }
+            );
+
+                ImportRecipes = function (checkedItems) {
+
+                    checkedItems.each(function (i, e) {
+                        
+                        console.log($(e).val());
+                        
+                        var recipeDiv = $('#MainContent_rptRecipes_divRecipe_' + $(e).val());
+                        var recipeDTO = {
+                            Auth : 'true',
+                            Action : 'createrecipe',
+                            Name: recipeDiv.find('.name').text(),
+                            Description: recipeDiv.find('.description').text(),
+                            PreparationTime: recipeDiv.find('.preparationTime').text(),
+                            CookingTime: recipeDiv.find('.cookingTime').text(),
+                            Serves: recipeDiv.find('.serves').text(),
+                            Ingredients: recipeDiv.find('.ingredients').html(),
+                            Method: recipeDiv.find('.method').html(),
+                            Keywords: recipeDiv.find('.keywords').text(),
+                            Suggestion: recipeDiv.find('.suggestion').text(),
+                            AssociatedAppliances: recipeDiv.find('.associatedAppliances').text(),
+                            ProductCategory: recipeDiv.find('.productCategory').text(),
+                            MealType: recipeDiv.find('.mealType').text(),
+                            Image: recipeDiv.find('.image').text()
+                        };
+
+                        console.log(recipeDiv.find('.name').text());
+
+                        $.when(CreateRecipePage(recipeDTO))
+                            .then(function() {
+                                recipeDiv.css('text-decoration', 'line-through');
+                            });
+                    });
+                };
+
+                ImportProducers = function (checkedItems) {
+                    console.log(checkedItems);
+                    checkedItems.each(function (i, e) {
+
+                        console.log($(e).val());
+
+                        var recipeDiv = $('div[data-id="' + $(e).val() + '"]');
+                        var recipeDTO = {
+                            Auth: 'true',
+                            Action: 'createproducer',
+                            ProductType: recipeDiv.find('.ProductType').text(),
+                            Variation: recipeDiv.find('.Variation').text(),
+                            Exceptions: recipeDiv.find('.Exceptions').text(),
+                            Brand: recipeDiv.find('.Brand').text(),
+                            ProducerName: recipeDiv.find('.ProducerName').text(),
+                            FirstName: recipeDiv.find('.FirstName').html(),
+                            LastName: recipeDiv.find('.LastName').html(),
+                            AddressLine1: recipeDiv.find('.AddressLine1').text(),
+                            AddressLine2: recipeDiv.find('.AddressLine2').text(),
+                            Country: recipeDiv.find('.Country').text(),
+                            CoOrdinates: recipeDiv.find('.CoOrdinates').text(),
+                            State: recipeDiv.find('.State').text(),
+                            PostCode: recipeDiv.find('.PostCode').text(),
+                            Biography: recipeDiv.find('.Biography').text()
+                        };
+
+                        console.log('importing ' + recipeDiv.find('.name').text());
+
+                        $.when(CreateProducerPage(recipeDTO))
+                            .then(function () {
+                                recipeDiv.css('text-decoration', 'line-through');
+                            });
+                    });
+                };
+                
+            CreateRecipePage = function (dto) {
+                $.ajax({
+                    url: "http://localhost:18012/Custom.Templates/Handlers/Add.ashx?callback=?",
+                    data: dto,
+                    dataType: "jsonp",
+                    contentType: "application/json"
+                    //jsonpCallback : jsonpCallback(dto)
+                }).done(function (data) {
+                    console.log(data.Success);
+                });
+            };
+
+            CreateProducerPage = function (dto) {
+                $.ajax({
+                    url: "http://localhost:18012/site.templates/handlers/ProducerImport.ashx?callback=?",
+                    data: dto,
+                    dataType: "jsonp",
+                    contentType: "application/json",
+                    method : "POST"
+                    //jsonpCallback : jsonpCallback(dto)
+                }).done(function (data) {
+                    console.log(data.Success);
+                });
+            };
+            
+            jsonpCallback = function (data) {
+
+                if (data.Success) {
+                    console.log('created successully');
+                } else {
+                    console.log(data.Error);
+                    throw new Error(data.Error);
+                }
+            };
+            
+        </script>
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form runat="server">
+    <div class="page">
+        <div class="header">
+            <div class="title">
+                <h1>
+                    Excel Importer
+                </h1>
+            </div>
+            <div class="loginDisplay">
+               
+            </div>
+            <div class="clear hideSkiplink">
+               <label for="importType">select a type:</label><select id="importType" runat="server"></select>
+               <input type="button" value="Import" id="Import"/>
+            </div>
+        </div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server"/>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <div class="footer">
+        
+    </div>
+    </form>
+</body>
+</html>

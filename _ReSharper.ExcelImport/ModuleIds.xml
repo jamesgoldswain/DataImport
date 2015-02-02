@@ -1,0 +1,6 @@
+<Modules>
+  <Module PersistentId="8DBB031D-1879-4FC7-846A-92BDC9D1B110" ModuleId="ExcelImport.UI" />
+  <Module PersistentId="77F258D4-343D-433B-BACB-7FC2C51C8ED9" ModuleId="ExcelImport.Infrastructure" />
+  <Module PersistentId="7A67FEF2-1DE0-4C9C-B1D3-676BF0E707B0" ModuleId="ExcelImporter.Common" />
+  <Module PersistentId="FD17777F-5CEC-457E-9255-CF61CC5214D5" ModuleId="ExcelImport.WebUI" />
+</Modules>

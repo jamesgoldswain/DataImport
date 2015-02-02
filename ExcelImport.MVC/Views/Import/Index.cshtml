@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>   
+        @{
+            ViewBag.Title = "Index";
+        }</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+      .variants { padding-left: 40px;}
+      progress {
+          color: #0063a6;
+          font-size: .6em;
+          line-height: 1.5em;
+          text-indent: .5em;
+          width: 15em;
+          height: 1.8em;
+          border: 1px solid #0063a6;
+          background: #fff;
+        }
+      .empty { color: red;font-weight: bold;}
+      .green {background-color: #e7d785 !important}
+      
+    </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=html&skin=default"></script>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Project name</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+        
+        <h2>Excel Import</h2>
+
+        <form action="/api/file" method="post" enctype="multipart/form-data">
+            <span>Select file(s) to upload :</span>
+            <input type="file" id="uploadFile" multiple="multiple"><br/>
+            <button id="uploadButton" class="btn btn-success hide">upload</button>
+        </form>
+
+        <div class="hide">
+            <progress id='p'></progress>
+            <a class="btn btn-primary" href="#"><i class="icon-refresh icon-spin"></i> Synchronizing Content...</a>
+            <a class="btn btn-danger" href="#"><i class="icon-trash icon-large"></i> Delete</a>
+        </div>
+        
+        <label for="pendingFiles">Pending files</label>
+        <ul id="pendingFiles"class="icons-ul"></ul>
+        
+        <div id="CurrentFile"></div>
+
+        <div class="progress hide">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                <span class="sr-only">60% Complete</span>
+            </div>
+        </div>
+        
+
+        <div id="FileImport" class="hide">
+            
+            <div id="importType">
+                <label>Name</label><input name="importTypeName" id="importTypeName"/>
+                <pre class="prettyprint">
+                    <ul id="importTypeFields" class="icons-ul prettyprint"></ul>
+                </pre>
+            </div>
+        
+            <!--icon-refresh icon-spin-->
+            <a class="btn btn-primary green hide" id="Import" href="#"><i class="green"></i> Ok, this looks good, import</a>
+        </div>
+
+    </div> <!-- /container -->
+      
+      
+     <!-- Modal -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">error</h3>
+      </div>
+      <div class="modal-body">
+        
+        <form>
+            
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+   
+      </div>
+    </div>
+
+      <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>    
+    <script src="~/Scripts/jquery.signalR-1.1.3.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <script type="text/javascript">
+
+        var getPendingFiles = function() {
+            $.ajax({
+                type: "GET",
+                url: "/api/file/GetSpreadSheetsToProcess",
+                contentType: false,
+                success: function (results) {
+                    var pendingFiles = $('#pendingFiles');
+                    pendingFiles.empty();
+                    $(results).each(function(i, e) {
+                        pendingFiles.append('<li><i class="icon-li icon-gear"></i>' + e + '</li>');
+                    });
+                    $('.icon-gear').click(function (e) {
+                        $(e.target).addClass('icon-spin');
+                        $(e.target).addClass('active');
+                        getSpreadSheetHeaders($(e.target));
+                    });
+                }
+            });
+        };
+
+        var ValidImport = function () {
+            if ($('#importTypeName').val().length > 0) {
+                return true;
+            }
+            return false;
+        };
+        
+        var Import = function () {
+            if (ValidImport()) {
+                $('#FileImport').addClass('hide');
+                $('.progress').removeClass('hide');
+                var fileName = $('#CurrentFile').html();
+                
+                $.getJSON("/api/importprocess/Process", { 'fileName': fileName }, function (results) {
+                    var result = results.Data;
+                   
+                    if (result.Success) {
+                        $('#CurrentFile').html(result.Name + ' processed with ' + result.Total);
+                        getPendingFiles();
+                    } else {
+                        $('#CurrentFile').html(result.Message);
+                    }
+                    
+                });
+
+            } else {
+                var modalBox = $("#myModal");
+                modalBox.find('form').html('Please enter a name for the class');
+                modalBox.modal();
+            }
+        };
+                
+        var getSpreadSheetHeaders = function (o) {
+            var fileName = o.parent().text();
+            var importTypeFields = $('#importTypeFields');
+            $.when
+            (
+             $.getJSON("/api/file/GetSpreadSheetHeaders", { 'fileName': fileName }, function (results) {
+                 console.log(results);
+                 o.removeClass('icon-spin');
+                 $('#FileImport').removeClass('hide');
+                 importTypeFields.empty();
+
+                 for (var key in results.Data) {
+                     var value = results.Data[key];
+                     var variants = '';
+                     
+                     if (key ==  "Variants") {
+                         console.log(value);
+                         variants = '{ Variants : <div class="variants">  ';
+                         for (var _key in value) {
+                             console.log(_key);
+                             variants += '<li> { <strong>' + _key + '</strong> : ' + (value[_key].length > 0 ? value[_key] : '<span class=\"empty\">EMPTY</span>') + ' } </li>';
+                         }
+                         variants += '}</div>';
+                         console.log(variants);
+                         importTypeFields.append(variants);
+                     } else {
+                         importTypeFields.append('<li> { <strong>' + key + '</strong> : ' + (value.length > 0 ? value : '<span class=\"empty\">EMPTY</span>') + ' } </li>');
+                     }
+                        
+                 }
+
+             })
+            ).then(function() {
+                 var importButton = $('#Import');
+                 importButton.removeClass('hide');
+                $('#CurrentFile').html(fileName);
+                 importButton.click(function(e) {
+                     Import();
+                 });
+            });
+        };
+        
+        var OnUpload = function() {
+            var files = $("#uploadFile").get(0).files;
+            var error = false;
+            
+            console.log(files);
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    var data = new FormData();
+                    for (i = 0; i < files.length; i++) {
+                        data.append("file" + i, files[i]);
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/file",
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function(results) {
+                            for (i = 0; i < results.length; i++) {
+  
+                                var uploadButton = $('#uploadButton');
+                                uploadButton.html('File uploaded');
+                            }
+                            getPendingFiles();
+                        },
+                        error: function (results) {
+                            error = true;
+                        }
+                    });
+                } else {
+                    alert("This browser doesn't support HTML5 multiple file uploads!");
+                }
+            }
+            
+            if (error)
+                throw new Error("Something bad happened.");
+        };
+        
+
+        $(function () {
+            var importstatus = $.connection.importstatus;
+            
+            importstatus.client.AddMessage = function (message) {
+                $('.progress-bar').animate({ width: message.Percentage + '%' },0);
+                console.log(message.Status);
+                console.log(message.Percentage);
+            };
+            
+            $.connection.hub.start();
+            
+            $('#uploadFile').change(function (e) {
+                var uploadButton = $('#uploadButton');
+                uploadButton.removeClass('hide').click(function (e) {
+                    e.preventDefault();
+                    try {
+                        OnUpload();
+                        $(e.target).html('<i class="icon-refresh icon-spin"></i> Uploading file ...');
+                    } catch (ex) {
+                        $(e.target).html('<i class="icon-refresh"></i> failed');
+                        console.log(ex);
+                    } 
+                });
+            });
+            
+            getPendingFiles();
+            
+            $('.popover-content').popover();
+
+        });
+
+        </script>
+  </body>
+</html>
