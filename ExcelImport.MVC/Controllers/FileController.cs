@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
 using ExcelImport.Infrastructure;
+using ExcelImport.Infrastructure.Constants;
 using ExcelImporter.Common;
 using Newtonsoft.Json;
+using System.Web;
 
 namespace ExcelImport.MVC.Controllers
 {
@@ -21,8 +23,8 @@ namespace ExcelImport.MVC.Controllers
         {
             if (Request.Content.IsMimeMultipartContent())
             {
-                
-                string fullPath = Path.Combine(Helpers.GetSetting("FolderToProcess"), "Pending");
+
+                string fullPath = Path.Combine(Helpers.GetSetting(ImportConstants.FOLDER_TO_PROCESS), ImportConstants.PENDING_FOLDER);
                 MyMultipartFormDataStreamProvider streamProvider = new MyMultipartFormDataStreamProvider(fullPath);
                 var task = Request.Content.ReadAsMultipartAsync(streamProvider).ContinueWith(t =>
                 {
@@ -49,7 +51,7 @@ namespace ExcelImport.MVC.Controllers
         public List<string> GetSpreadSheetsToProcess()
         {
             var fileList = new List<string>();
-            string directoryPath = Path.Combine(Helpers.GetSetting("FolderToProcess"), "Pending");
+            string directoryPath = Path.Combine(Helpers.GetSetting(ImportConstants.FOLDER_TO_PROCESS), "Pending");
 
             foreach (var file in Directory.GetFiles(directoryPath))
             {
@@ -61,9 +63,30 @@ namespace ExcelImport.MVC.Controllers
         }
 
         [System.Web.Http.HttpGet]
+        public bool Delete(string fileToDelete)
+        {
+
+            string directoryPath = Path.Combine(Helpers.GetSetting(ImportConstants.FOLDER_TO_PROCESS), ImportConstants.PENDING_FOLDER);
+            string deletedDirectoryPath = Path.Combine(Helpers.GetSetting(ImportConstants.FOLDER_TO_PROCESS), ImportConstants.DELETED_FOLDER);
+
+            var file = Directory.GetFiles(directoryPath).Where(f => f == Path.Combine(directoryPath, fileToDelete));
+           
+            if (file.Any())
+            {
+                if (File.Exists(Path.Combine(deletedDirectoryPath, fileToDelete)))
+                {
+                    File.Move(Path.Combine(deletedDirectoryPath, fileToDelete), Path.Combine(deletedDirectoryPath, DateTime.Now.ToFileTimeUtc().ToString() + '_' + fileToDelete));
+                }
+                File.Move(Path.Combine(directoryPath, fileToDelete), Path.Combine(deletedDirectoryPath, fileToDelete));
+                return true;
+            }
+            return false;
+        }
+
+        [System.Web.Http.HttpGet]
         public ActionResult GetSpreadSheetHeaders(string fileName)
         {
-            string spreadSheetPath = Path.Combine(Helpers.GetSetting("FolderToProcess"), "Pending", fileName);
+            string spreadSheetPath = Path.Combine(Helpers.GetSetting(ImportConstants.FOLDER_TO_PROCESS), ImportConstants.PENDING_FOLDER, fileName);
 
             if (File.Exists(spreadSheetPath))
             {
@@ -121,13 +144,13 @@ namespace ExcelImport.MVC.Controllers
 
         public static bool SetAsProcessed(string fileName)
         {
-            string spreadSheetPath = Path.Combine(Helpers.GetSetting("FolderToProcess"), "Pending", fileName);
-            string importCompletePath = Path.Combine(Helpers.GetSetting("FolderToProcess"), "ImportComplete", fileName);
+            string spreadSheetPath = Path.Combine(Helpers.GetSetting(ImportConstants.FOLDER_TO_PROCESS), ImportConstants.PENDING_FOLDER, fileName);
+            string importCompletePath = Path.Combine(Helpers.GetSetting(ImportConstants.FOLDER_TO_PROCESS), ImportConstants.PROCESSED_FOLDER, fileName);
 
             if (File.Exists(spreadSheetPath))
             {
                 FileInfo fi = new FileInfo(spreadSheetPath);
-                try
+                try 
                 {
                     fi.MoveTo(importCompletePath);
                 }

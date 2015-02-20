@@ -17,7 +17,9 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
+
       .variants { padding-left: 40px;}
+
       progress {
           color: #0063a6;
           font-size: .6em;
@@ -28,9 +30,23 @@
           border: 1px solid #0063a6;
           background: #fff;
         }
+
       .empty { color: red;font-weight: bold;}
       .green {background-color: #e7d785 !important}
-      
+      .red {background-color: red !important}
+      .delete { display: none;}
+      .padded { padding: 10px;margin: 10px;}
+      .opaque {opacity: 0.4; filter: alpha(opacity=40);}
+
+      #bin { width: 200px; height: 100px;float: right;}
+
+      .dashed {border: dashed 5px #fff;}
+
+      .rounded {-moz-border-radius: 15px; border-radius: 15px;}
+
+      #ui-state-active { background-color: #666}
+      #pendingFiles li { width: 100px; height: auto;}
+
     </style>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -69,7 +85,7 @@
 
     <div class="container">
         
-        <h2>Excel Import</h2>
+        <h2>Importer</h2>
 
         <form action="/api/file" method="post" enctype="multipart/form-data">
             <span>Select file(s) to upload :</span>
@@ -82,8 +98,11 @@
             <a class="btn btn-primary" href="#"><i class="icon-refresh icon-spin"></i> Synchronizing Content...</a>
             <a class="btn btn-danger" href="#"><i class="icon-trash icon-large"></i> Delete</a>
         </div>
-        
+
+        <div id="bin" class="red opaque padded rounded"></div>
+
         <label for="pendingFiles">Pending files</label>
+
         <ul id="pendingFiles"class="icons-ul"></ul>
         
         <div id="CurrentFile"></div>
@@ -134,6 +153,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>    
     <script src="~/Scripts/jquery.signalR-1.1.3.min.js"></script>
     <script src="~/signalr/hubs"></script>
@@ -149,13 +169,16 @@
                     var pendingFiles = $('#pendingFiles');
                     pendingFiles.empty();
                     $(results).each(function(i, e) {
-                        pendingFiles.append('<li><i class="icon-li icon-gear"></i>' + e + '</li>');
+                        pendingFiles.append('<li><i class="icon-li icon-gear"></i><a href="#">' + e + '</a></li>');
                     });
                     $('.icon-gear').click(function (e) {
                         $(e.target).addClass('icon-spin');
                         $(e.target).addClass('active');
                         getSpreadSheetHeaders($(e.target));
                     });
+                    
+                    $("#pendingFiles li").draggable({ revert : true});
+                    
                 }
             });
         };
@@ -233,6 +256,21 @@
                  });
             });
         };
+
+        var deleteFile = function(name) {
+            $.ajax({
+                type: "GET",
+                url: "/api/file/delete/" + name,
+                contentType: false,
+                processData: false,
+                success: function (results) {
+                    console.log(results);
+                },
+                error: function (results) {
+                    error = true;
+                }
+            });
+        };
         
         var OnUpload = function() {
             var files = $("#uploadFile").get(0).files;
@@ -274,12 +312,16 @@
         
 
         $(function () {
+
             var importstatus = $.connection.importstatus;
             
             importstatus.client.AddMessage = function (message) {
                 $('.progress-bar').animate({ width: message.Percentage + '%' },0);
-                console.log(message.Status);
-                console.log(message.Percentage);
+                 $('#CurrentFile').html(message.Status);
+                if (message.Success) {
+
+                    console.log(message.Success);
+                }
             };
             
             $.connection.hub.start();
@@ -300,6 +342,19 @@
             
             getPendingFiles();
             
+
+            $("#bin").droppable({
+                accept: "#pendingFiles li",
+                hoverClass: "dashed",
+                drop: function (event, ui) {
+                    console.log('deleting ' + ui.draggable.text());
+                    deleteFile(ui.draggable.text());
+                    ui.draggable.remove();
+                    
+                }
+            });
+
+
             $('.popover-content').popover();
 
         });
