@@ -15,16 +15,17 @@ namespace ExcelImport.MVC
     {
         protected void Application_Start()
         {
+
             AreaRegistration.RegisterAllAreas();
 
             RouteTable.Routes.MapHubs();
 
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
-            //RouteTable.Routes.MapRoute(null, "{controller}/{action}");
 
         }
+
     }
 }

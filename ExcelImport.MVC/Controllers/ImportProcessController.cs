@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
-using System.Threading.Tasks;
-using System.Web.Http;
 using System.Web.Mvc;
 using ExcelImport.Infrastructure;
 using ExcelImport.Infrastructure.Constants;
@@ -13,8 +9,6 @@ using ExcelImport.MVC.Hubs;
 using ExcelImporter.Common;
 using Microsoft.AspNet.SignalR;
 using Raven.Client;
-using Microsoft.AspNet.SignalR.Hubs;
-using System.Net.Http;
 using System.Linq;
 
 namespace ExcelImport.MVC.Controllers
@@ -65,39 +59,39 @@ namespace ExcelImport.MVC.Controllers
 
                     var importRows = spreadSheet.GetRows(0);
 
-                    try
-                    {
-                        //List<ExpandoObject> importVariants = spreadSheet.GetRows(1);
-                        int x = 1;
+                    //try
+                    //{
+                    //    //List<ExpandoObject> importVariants = spreadSheet.GetRows(1);
+                    //    int x = 1;
 
-                        importStatusUpdate.Status = string.Format("Found {0} products", importRows.Count);
-                        Hub.Clients.All.AddMessage(importStatusUpdate);
+                    //    importStatusUpdate.Status = string.Format("Found {0} products", importRows.Count);
+                    //    Hub.Clients.All.AddMessage(importStatusUpdate);
 
-                        foreach (dynamic row in importRows)
-                        {
+                    //    foreach (dynamic row in importRows)
+                    //    {
 
-                            //var query = from t in importVariants
-                            //    where
-                            //        ((IDictionary<string, object>) t)["ParentProductId"].ToString() == row.Id.ToString()
-                            //    select t;
+                    //        //var query = from t in importVariants
+                    //        //    where
+                    //        //        ((IDictionary<string, object>) t)["ParentProductId"].ToString() == row.Id.ToString()
+                    //        //    select t;
 
-                            ////var productVariants = importVariants.AsQueryable().Where(r => r.ParentProductId == row.Id);
-                            //if (query.Any())
-                            //{
-                            //    ((IDictionary<string, object>) row)["Variants"] = query.ToList();
-                            //}
-                        }
+                    //        ////var productVariants = importVariants.AsQueryable().Where(r => r.ParentProductId == row.Id);
+                    //        //if (query.Any())
+                    //        //{
+                    //        //    ((IDictionary<string, object>) row)["Variants"] = query.ToList();
+                    //        //}
+                    //    }
 
-                        importStatusUpdate.Status = "Products processed";
-                        Hub.Clients.All.AddMessage(importStatusUpdate);
+                    //    importStatusUpdate.Status = "Products processed";
+                    //    Hub.Clients.All.AddMessage(importStatusUpdate);
 
-                    }
-                    catch (Exception ex)
-                    {
-                        // no variants
-                        importStatusUpdate.Status = "There was an error importing";
-                        Hub.Clients.All.AddMessage(importStatusUpdate);
-                    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    // no variants
+                    //    importStatusUpdate.Status = "There was an error importing";
+                    //    Hub.Clients.All.AddMessage(importStatusUpdate);
+                    //}
 
                     var import = new Import();
 
@@ -140,6 +134,7 @@ namespace ExcelImport.MVC.Controllers
 
             return new MyResult().GetJson(result);
         }
+
     }
 
 }

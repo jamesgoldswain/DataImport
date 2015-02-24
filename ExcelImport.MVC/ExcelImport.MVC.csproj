@@ -133,6 +133,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\ImportController.cs" />
     <Compile Include="Controllers\ApiControllerWithHub.cs" />
     <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\ImportController.cs" />
