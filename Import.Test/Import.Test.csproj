@@ -52,8 +52,13 @@
   <ItemGroup>
     <Compile Include="ReflectionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataImport.Service\DataImport.Service.csproj">
+      <Project>{902c4752-ce2c-4279-934d-5544f33e02ea}</Project>
+      <Name>DataImport.Service</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExcelImport.Infrastructure\ExcelImport.Infrastructure.csproj">
       <Project>{77f258d4-343d-433b-bacb-7fc2c51c8ed9}</Project>
       <Name>ExcelImport.Infrastructure</Name>

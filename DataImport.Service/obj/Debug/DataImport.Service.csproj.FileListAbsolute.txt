@@ -1,0 +1,5 @@
+D:\Sites\DataImport\DataImport.Service\obj\Debug\DataImport.Service.csprojResolveAssemblyReference.cache
+D:\Sites\DataImport\DataImport.Service\bin\Debug\DataImport.Service.dll
+D:\Sites\DataImport\DataImport.Service\bin\Debug\DataImport.Service.pdb
+D:\Sites\DataImport\DataImport.Service\obj\Debug\DataImport.Service.dll
+D:\Sites\DataImport\DataImport.Service\obj\Debug\DataImport.Service.pdb

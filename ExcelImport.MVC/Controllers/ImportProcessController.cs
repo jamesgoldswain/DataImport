@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Web.Mvc;
 using ExcelImport.Infrastructure;
@@ -57,41 +58,7 @@ namespace ExcelImport.MVC.Controllers
                 {
                     string dbName = Helpers.GetSetting("DBName");
 
-                    var importRows = spreadSheet.GetRows(0);
-
-                    //try
-                    //{
-                    //    //List<ExpandoObject> importVariants = spreadSheet.GetRows(1);
-                    //    int x = 1;
-
-                    //    importStatusUpdate.Status = string.Format("Found {0} products", importRows.Count);
-                    //    Hub.Clients.All.AddMessage(importStatusUpdate);
-
-                    //    foreach (dynamic row in importRows)
-                    //    {
-
-                    //        //var query = from t in importVariants
-                    //        //    where
-                    //        //        ((IDictionary<string, object>) t)["ParentProductId"].ToString() == row.Id.ToString()
-                    //        //    select t;
-
-                    //        ////var productVariants = importVariants.AsQueryable().Where(r => r.ParentProductId == row.Id);
-                    //        //if (query.Any())
-                    //        //{
-                    //        //    ((IDictionary<string, object>) row)["Variants"] = query.ToList();
-                    //        //}
-                    //    }
-
-                    //    importStatusUpdate.Status = "Products processed";
-                    //    Hub.Clients.All.AddMessage(importStatusUpdate);
-
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    // no variants
-                    //    importStatusUpdate.Status = "There was an error importing";
-                    //    Hub.Clients.All.AddMessage(importStatusUpdate);
-                    //}
+                    var importRows = GetRows(spreadSheet);
 
                     var import = new Import();
 
@@ -135,6 +102,72 @@ namespace ExcelImport.MVC.Controllers
             return new MyResult().GetJson(result);
         }
 
+
+        private static List<ExpandoObject> GetRows(ExcelSheet spreadSheet)
+        {
+            var spreadSheets = spreadSheet.GetAllSheets();
+
+            var sheetsInDocumentToProcess = new List<string>();
+
+            foreach (var sheet in spreadSheets)
+            {
+                var headers = spreadSheet.GetExcelHeaders(sheet);
+                if (headers.Any())
+                {
+                    // this sheet has headings
+                    sheetsInDocumentToProcess.Add(sheet);
+                }
+            }
+
+            if (sheetsInDocumentToProcess.Any())
+            {
+                var allRowsImport = new List<ExpandoObject>();
+                // there are relations, so lets build them
+                foreach (var sheet in sheetsInDocumentToProcess)
+                {
+                    List<ExpandoObject> importVariants = spreadSheet.GetRows(sheet);
+                    allRowsImport.AddRange(importVariants);
+                }
+
+
+                var rootItems = from t in allRowsImport where ((IDictionary<string, object>)t)["Parent"].ToString() == string.Empty select t;
+
+
+
+                foreach (var rootItem in rootItems)
+                {
+                    dynamic x = new ExpandoObject();
+                    dynamic item = rootItem;
+
+                    // set the root
+                    x.Root = item.Category;
+
+                    // get the root children
+                    var rootItemsRelations = from t in allRowsImport where ((IDictionary<string, object>)t)["Parent"].ToString() == item.Category.ToString() select t;
+
+                    x.Items = rootItemsRelations;
+
+                    foreach (dynamic rootItemsRelation in x.Items)
+                    {
+
+
+                        dynamic rootItemsRelationItem = rootItemsRelation;
+                        dynamic y = new ExpandoObject();
+
+                        var rootItemsRelationsSub = from t in allRowsImport where ((IDictionary<string, object>)t)["Parent"].ToString() == rootItemsRelationItem.Category.ToString() select t;
+
+                        y.Items = rootItemsRelationsSub;
+                        rootItemsRelation.Items = y.Items;
+                    }
+                    return new List<ExpandoObject> { x };
+                }
+            }
+            else
+            {
+                return spreadSheet.GetRows(0);
+            }
+            return null;
+        }
     }
 
 }

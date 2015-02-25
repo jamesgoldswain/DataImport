@@ -109,6 +109,11 @@ namespace ExcelImport.Infrastructure
             return excel.GetWorksheetNames().FirstOrDefault();
         }
 
+        public List<string> GetAllSheets()
+        {
+            return excel.GetWorksheetNames().ToList();
+        }
+
         public List<ExpandoObject> GetRows(int index)
         {
             var headers = GetExcelHeaders(0);

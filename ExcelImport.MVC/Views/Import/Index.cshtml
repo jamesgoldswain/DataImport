@@ -74,11 +74,9 @@
             <span class="icon-bar"></span>
           </button>
           <a class="brand" href="#">Project name</a>
-          <div class="nav-collapse collapse">
+          <div class="nav-collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li class="active"><a href="#">Category import</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -193,7 +191,7 @@
             });
         };
 
-        var getPendingFiles = function () {
+        var getPendingImports = function () {
             $.ajax({
                 type: "GET",
                 url: "/api/import/list",
@@ -238,6 +236,7 @@
                     if (result.Success) {
                         $('#CurrentFile').html(result.Name + ' processed with ' + result.Total);
                         getPendingFiles();
+                        getPendingImports();
                     } else {
                         $('#CurrentFile').html(result.Message);
                     }
@@ -377,7 +376,7 @@
             });
             
             getPendingFiles();
-            
+            getPendingImports();
 
             $("#bin").droppable({
                 accept: "#pendingFiles li",

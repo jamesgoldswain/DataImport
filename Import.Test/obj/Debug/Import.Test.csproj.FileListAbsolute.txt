@@ -29,7 +29,6 @@ E:\Projects\ExcelImport\Import.Test\obj\Debug\Import.Test.csprojResolveAssemblyR
 E:\Projects\ExcelImport\Import.Test\obj\Debug\Import.Test.dll
 E:\Projects\ExcelImport\Import.Test\obj\Debug\Import.Test.pdb
 E:\Projects\ExcelImport\Import.Test\bin\Debug\AutoMapper.Net4.dll
-D:\Sites\DataImport\Import.Test\bin\Debug\AutoMapper.Net4.dll
 D:\Sites\DataImport\Import.Test\bin\Debug\Import.Test.dll
 D:\Sites\DataImport\Import.Test\bin\Debug\Import.Test.pdb
 D:\Sites\DataImport\Import.Test\bin\Debug\ExcelImport.Infrastructure.dll
@@ -45,3 +44,6 @@ D:\Sites\DataImport\Import.Test\bin\Debug\ExcelImporter.Common.pdb
 D:\Sites\DataImport\Import.Test\obj\Debug\Import.Test.csprojResolveAssemblyReference.cache
 D:\Sites\DataImport\Import.Test\obj\Debug\Import.Test.dll
 D:\Sites\DataImport\Import.Test\obj\Debug\Import.Test.pdb
+D:\Sites\DataImport\Import.Test\bin\Debug\DataImport.Service.dll
+D:\Sites\DataImport\Import.Test\bin\Debug\DataImport.Service.pdb
+D:\Sites\DataImport\Import.Test\bin\Debug\AutoMapper.Net4.dll
