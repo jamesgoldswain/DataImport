@@ -21,15 +21,9 @@ namespace ExcelImport.MVC
                new { controller = "File", action = "GetSpreadSheetsToProcess" });
 
             config.Routes.MapHttpRoute(
-               "Delete",
-               "api/{controller}/{action}/{fileToDelete}",
-               new { controller = "File", action = "Delete", fileToDelete = RouteParameter.Optional });
-
-            config.Routes.MapHttpRoute(
                "GetSpreadSheetHeaders",
                "api/{controller}/{action}/{fileName}",
                new { controller = "File", action = "GetSpreadSheetHeaders", fileName = RouteParameter.Optional });
-
 
             //api/importprocess/Process
             config.Routes.MapHttpRoute(

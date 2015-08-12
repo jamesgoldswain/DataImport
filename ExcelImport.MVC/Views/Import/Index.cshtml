@@ -17,9 +17,7 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
-
       .variants { padding-left: 40px;}
-
       progress {
           color: #0063a6;
           font-size: .6em;
@@ -30,9 +28,9 @@
           border: 1px solid #0063a6;
           background: #fff;
         }
-
       .empty { color: red;font-weight: bold;}
       .green {background-color: #e7d785 !important}
+<<<<<<< HEAD
       .red {background-color: red !important}
       .delete { display: none;}
       .padded { padding: 10px;margin: 10px;}
@@ -49,6 +47,9 @@
 
       .right { float: right;}
 
+=======
+      
+>>>>>>> parent of 926fb68... New functionality including file deletion
     </style>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -83,10 +84,17 @@
       </div>
     </div>
 
+<<<<<<< HEAD
       <div class="container">
+=======
+    <div class="container">
+        
+        <h2>Excel Import</h2>
+>>>>>>> parent of 926fb68... New functionality including file deletion
 
           <h2>Importer</h2>
 
+<<<<<<< HEAD
           <div id="PendingImports" class="right">
               <a href="#"><span class="badge red opaque hide right"></span></a>
               <ul class="hide"></ul>
@@ -109,6 +117,16 @@
           <label for="pendingFiles">Pending files</label>
 
           <ul id="pendingFiles"class="icons-ul"></ul>
+=======
+        <div class="hide">
+            <progress id='p'></progress>
+            <a class="btn btn-primary" href="#"><i class="icon-refresh icon-spin"></i> Synchronizing Content...</a>
+            <a class="btn btn-danger" href="#"><i class="icon-trash icon-large"></i> Delete</a>
+        </div>
+        
+        <label for="pendingFiles">Pending files</label>
+        <ul id="pendingFiles"class="icons-ul"></ul>
+>>>>>>> parent of 926fb68... New functionality including file deletion
         
           <div id="CurrentFile"></div>
 
@@ -158,7 +176,6 @@
     <!-- Placed at the end of the document so the pages load faster -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>    
     <script src="~/Scripts/jquery.signalR-1.1.3.min.js"></script>
     <script src="~/signalr/hubs"></script>
@@ -176,7 +193,7 @@
                     pendingFiles.empty();
                     
                     $(results).each(function(i, e) {
-                        pendingFiles.append('<li><i class="icon-li icon-gear"></i><a href="#">' + e + '</a></li>');
+                        pendingFiles.append('<li><i class="icon-li icon-gear"></i>' + e + '</li>');
                     });
                     
                     $('.icon-gear').click(function (e) {
@@ -184,9 +201,6 @@
                         $(e.target).addClass('active');
                         getSpreadSheetHeaders($(e.target));
                     });
-                    
-                    $("#pendingFiles li").draggable({ revert : true});
-                    
                 }
             });
         };
@@ -291,21 +305,6 @@
                  });
             });
         };
-
-        var deleteFile = function(name) {
-            $.ajax({
-                type: "GET",
-                url: "/api/file/delete/" + name,
-                contentType: false,
-                processData: false,
-                success: function (results) {
-                    console.log(results);
-                },
-                error: function (results) {
-                    error = true;
-                }
-            });
-        };
         
         var OnUpload = function() {
             var files = $("#uploadFile").get(0).files;
@@ -347,16 +346,12 @@
         
 
         $(function () {
-
             var importstatus = $.connection.importstatus;
             
             importstatus.client.AddMessage = function (message) {
                 $('.progress-bar').animate({ width: message.Percentage + '%' },0);
-                 $('#CurrentFile').html(message.Status);
-                if (message.Success) {
-
-                    console.log(message.Success);
-                }
+                console.log(message.Status);
+                console.log(message.Percentage);
             };
             
             $.connection.hub.start();
@@ -376,6 +371,7 @@
             });
             
             getPendingFiles();
+<<<<<<< HEAD
             getPendingImports();
 
             $("#bin").droppable({
@@ -390,6 +386,9 @@
             });
 
 
+=======
+            
+>>>>>>> parent of 926fb68... New functionality including file deletion
             $('.popover-content').popover();
 
         });

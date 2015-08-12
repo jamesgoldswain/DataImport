@@ -68,7 +68,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants\ImportConstants.cs" />
     <Compile Include="Entities\Import.cs" />
     <Compile Include="Entities\ProducerException.cs" />
     <Compile Include="Entities\Product.cs" />

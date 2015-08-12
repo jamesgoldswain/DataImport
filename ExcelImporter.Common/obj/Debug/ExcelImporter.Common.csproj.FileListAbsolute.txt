@@ -12,7 +12,3 @@ E:\Projects\ExcelImport\ExcelImporter.Common\bin\Debug\ExcelImporter.Common.pdb
 E:\Projects\ExcelImport\ExcelImporter.Common\obj\Debug\ExcelImporter.Common.csprojResolveAssemblyReference.cache
 E:\Projects\ExcelImport\ExcelImporter.Common\obj\Debug\ExcelImporter.Common.dll
 E:\Projects\ExcelImport\ExcelImporter.Common\obj\Debug\ExcelImporter.Common.pdb
-D:\Sites\DataImport\ExcelImporter.Common\bin\Debug\ExcelImporter.Common.dll
-D:\Sites\DataImport\ExcelImporter.Common\bin\Debug\ExcelImporter.Common.pdb
-D:\Sites\DataImport\ExcelImporter.Common\obj\Debug\ExcelImporter.Common.dll
-D:\Sites\DataImport\ExcelImporter.Common\obj\Debug\ExcelImporter.Common.pdb
